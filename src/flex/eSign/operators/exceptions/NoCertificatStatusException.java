@@ -2,12 +2,12 @@
  * lib-flex-esign
  *
  * Copyright (C) 2010
- * Ing. Felix D. Lopez M. - flex.developments@gmail.com
+ * Ing. Felix D. Lopez M. - flex.developments en gmail
  * 
  * Desarrollo apoyado por la Superintendencia de Servicios de Certificación 
  * Electrónica (SUSCERTE) durante 2010-2014 por:
- * Ing. Felix D. Lopez M. - flex.developments@gmail.com | flopez@suscerte.gob.ve
- * Ing. Yessica De Ascencao - yessicadeascencao@gmail.com | ydeascencao@suscerte.gob.ve
+ * Ing. Felix D. Lopez M. - flex.developments en gmail | flopez en suscerte gob ve
+ * Ing. Yessica De Ascencao - yessicadeascencao en gmail | ydeascencao en suscerte gob ve
  *
  * Este programa es software libre; Usted puede usarlo bajo los terminos de la
  * licencia de software GPL version 2.0 de la Free Software Foundation.
@@ -27,8 +27,8 @@ import flex.eSign.i18n.I18n;
 /**
  * NoCertificatStatusException
  * 
- * @author Ing. Felix D. Lopez M. - flex.developments@gmail.com
- * @author Ing. Yessica De Ascencao - yessicadeascencao@gmail.com
+ * @author Ing. Felix D. Lopez M. - flex.developments en gmail
+ * @author Ing. Yessica De Ascencao - yessicadeascencao en gmail
  * @version 1.0
  */
 public class NoCertificatStatusException extends Exception {

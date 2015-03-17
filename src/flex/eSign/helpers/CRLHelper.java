@@ -20,8 +20,8 @@
  * ---
  * Modificación apoyada por la Superintendencia de Servicios de Certificación 
  * Electrónica (SUSCERTE) durante 2010-2014 por:
- * Ing. Felix D. Lopez M. - flex.developments@gmail.com | flopez@suscerte.gob.ve
- * Ing. Yessica De Ascencao - yessicadeascencao@gmail.com | ydeascencao@suscerte.gob.ve
+ * Ing. Felix D. Lopez M. - flex.developments en gmail | flopez en suscerte gob ve
+ * Ing. Yessica De Ascencao - yessicadeascencao en gmail | ydeascencao en suscerte gob ve
  */
 
 package flex.eSign.helpers;
@@ -65,8 +65,8 @@ import javax.security.auth.x500.X500Principal;
  * 
  * @author Apache Software Foundation (ASF)
  * ----
- * @author Ing. Felix D. Lopez M. - flex.developments@gmail.com
- * @author Ing. Yessica De Ascencao - yessicadeascencao@gmail.com
+ * @author Ing. Felix D. Lopez M. - flex.developments en gmail
+ * @author Ing. Yessica De Ascencao - yessicadeascencao en gmail
  */
 public final class CRLHelper {
     final public static String NO_DISTRIBUTION_POINTS = "no-DP";
