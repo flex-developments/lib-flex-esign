@@ -2,7 +2,7 @@
 Librería que provee operaciones criptográficas para firma electrónica, métodos para validación de certificados y algunos métodos útiles para operaciones sobre objetos que son soportados por esta librería.
 
 Dependencias:
- * itext-v544-nonofficial v010
+ * itextpdf-v552-nonofficial v010
    * xmlsec-1.5.2-nonofficial
  * bc-jdk15to17-v150-nonofficial v010
  * lib-flex-pkikeys v010
