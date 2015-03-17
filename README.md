@@ -1,7 +1,7 @@
 # lib-flex-esign
 Librería que provee operaciones criptográficas para firma electrónica, métodos para validación de certificados y algunos métodos útiles para operaciones sobre objetos que son soportados por esta librería.
 
-Dependencias:
+## Dependencias
  * itextpdf-v552-nonofficial v010
    * xmlsec-1.5.2-nonofficial
  * bc-jdk15to17-v150-nonofficial v010
@@ -10,7 +10,7 @@ Dependencias:
    * commons-net-3.1
    * mail
 
-Copyright (C) 2010
+## Copyright (C) 2010
 Ing. Felix D. Lopez M. - flex.developments@gmail.com
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010-2014 por:
