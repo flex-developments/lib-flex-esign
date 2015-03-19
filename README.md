@@ -10,12 +10,12 @@ Librería que provee operaciones criptográficas para firma electrónica, métod
    * commons-net-3.1
    * mail
 
-## Copyright (C) 2010
-Ing. Felix D. Lopez M. - flex.developments en gmail
+## Copyright (C) 2010 Ing. Felix D. Lopez M.
+ * Ing. Felix D. Lopez M. - flex.developments en gmail
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010-2014 por:
-Ing. Felix D. Lopez M. - flex.developments en gmail | flopez en suscerte gob ve
-Ing. Yessica De Ascencao - yessicadeascencao en gmail | ydeascencao en suscerte gob ve
+ * Ing. Felix D. Lopez M. - flex.developments en gmail | flopez en suscerte gob ve
+ * Ing. Yessica De Ascencao - yessicadeascencao en gmail | ydeascencao en suscerte gob ve
 
 Continuidad de mantenimiento por:
 Ing. Felix D. Lopez M. - flex.developments en gmail
