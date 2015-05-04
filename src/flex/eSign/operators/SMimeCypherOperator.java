@@ -61,7 +61,7 @@ public final class SMimeCypherOperator {
         try {
             CMSTypedData message = new CMSProcessableByteArray(data);
             CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
-            Provider provider = ProviderHelper.getRegBouncyCastleCryptographyProvider();
+            Provider provider = ProviderHelper.getRegCryptographyProvider(null);
             
             edGen.addRecipientInfoGenerator(
                 new JceKeyTransRecipientInfoGenerator(certificate).setProvider(provider)
@@ -96,7 +96,7 @@ public final class SMimeCypherOperator {
 
             Collection  c = recipients.getRecipients();
             Iterator    it = c.iterator();
-            Provider provider = ProviderHelper.getRegBouncyCastleCryptographyProvider();
+            Provider provider = ProviderHelper.getRegCryptographyProvider(null);
             
             if (it.hasNext()){
                 RecipientInformation   recipient = (RecipientInformation)it.next();

@@ -48,7 +48,6 @@ public class I18n {
     final public static String M_ERROR_SIGN_STANDARD_NOT_SUPPORTED = "M_ERROR_SIGN_STANDARD_NOT_SUPPORTED";
     final public static String M_ERROR_UNKNOWN_ALGORITHMS = "M_ERROR_UNKNOWN_ALGORITHMS";
     final public static String M_ERROR_ALGORITHMS_NOT_SUPPORTED_BY_DEVICE = "M_ERROR_ALGORITHMS_NOT_SUPPORTED_BY_DEVICE";
-    final public static String M_ERROR_NULL_PROVIDER = "M_ERROR_NULL_PROVIDER";
     final public static String M_ERROR_OCSP_EXTRACT_URL = "M_ERROR_OCSP_EXTRACT_URL";
     final public static String M_ERROR_EXTENSION_EXTRACT = "M_ERROR_EXTENSION_EXTRACT";
     final public static String M_ERROR_BASIC_SIGN_NOT_FORMAT = "M_ERROR_BASIC_SIGN_NOT_FORMAT";
@@ -67,6 +66,7 @@ public class I18n {
     final public static String M_ERROR_OCSP_FAIL = "M_ERROR_OCSP_FAIL";
     final public static String M_ERROR_NO_CERTIFICATE_ESTATUS = "M_ERROR_NO_CERTIFICATE_ESTATUS";
     final public static String M_ERROR_PDF_SIGN_DATE_NULL = "M_ERROR_PDF_SIGN_DATE_NULL";
+    final public static String M_ERROR_PDF_SIGN_SPACE = "M_ERROR_PDF_SIGN_SPACE";
     final public static String M_ERROR_OCSP_REQUEST = "M_ERROR_OCSP_REQUEST";
     final public static String M_ERROR_PRIVATE_KEY_NOT_YET = "M_ERROR_PRIVATE_KEY_NOT_YET";
     final public static String M_ERROR_PRIVATE_KEY_EXCEPTION = "M_ERROR_PRIVATE_KEY_EXCEPTION";

@@ -30,20 +30,16 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfDate;
+import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfPKCS7;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignature;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.PdfString;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.security.BouncyCastleDigest;
-import com.itextpdf.text.pdf.security.DigestAlgorithms;
-import com.itextpdf.text.pdf.security.ExternalDigest;
-import com.itextpdf.text.pdf.security.ExternalSignature;
-import com.itextpdf.text.pdf.security.MakeSignature;
-import com.itextpdf.text.pdf.security.MakeSignature.CryptoStandard;
-import com.itextpdf.text.pdf.security.PdfPKCS7;
-import com.itextpdf.text.pdf.security.PrivateKeySignature;
+import com.itextpdf.text.pdf.TSAClient;
 import flex.eSign.helpers.ProviderHelper;
 import flex.eSign.helpers.AlgorithmsHelper;
 import flex.eSign.helpers.CertificateHelper;
@@ -63,6 +59,7 @@ import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.ProviderException;
+import java.security.cert.CRL;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
@@ -227,9 +224,8 @@ public class PDFOperator {
              MalformedURLException, 
              IOException 
     {
-        
         PdfSignatureAppearance signAppearance = pdfStamper.getSignatureAppearance();
-        signAppearance.setCertificate(certificate);
+        
         if (readPass != null) {
             pdfStamper.setEncryption(
                 true, 
@@ -286,6 +282,7 @@ public class PDFOperator {
      * @param pdfIn
      * @param key
      * @param certificate
+     * @param crl
      * @param readPass
      * @param writePass
      * @param reason
@@ -310,6 +307,7 @@ public class PDFOperator {
         PdfReader pdfIn,
         PrivateKey key, 
         X509Certificate certificate, 
+        CRL crl,
         String readPass, 
         String writePass, 
         String reason, 
@@ -332,6 +330,7 @@ public class PDFOperator {
         try {
             AlgorithmsHelper.isSupportedSignAlg(signAlg);
             
+            cryptographyProvider = ProviderHelper.getRegCryptographyProvider(cryptographyProvider);
             ByteArrayOutputStream signedPDF = new ByteArrayOutputStream();
             PdfStamper pdfStamper = generateSignStamper(pdfIn, signedPDF);
             
@@ -356,35 +355,59 @@ public class PDFOperator {
                 imgRotation
             );
             
-            //Preparar parámetros finales para firma
-                cryptographyProvider = ProviderHelper.getRegCryptographyProviderOrDefault(cryptographyProvider);
+            signAppearance.setCrypto(key, certificate, crl, PdfSignatureAppearance.SELF_SIGNED);
             
-                ExternalSignature es = 
-                    new PrivateKeySignature(
-                        key, 
-                        AlgorithmsHelper.getHashAlgFromSignAlg(signAlg), 
-                        cryptographyProvider.getName()
-                );
-                
-                ExternalDigest digest = new BouncyCastleDigest();
-                X509Certificate[] certs = new X509Certificate[1];
+            PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, new PdfName("adbe.pkcs7.detached"));
+                dic.setReason(signAppearance.getReason());
+                dic.setLocation(signAppearance.getLocation());
+                dic.setContact(signAppearance.getContact());
+                dic.setDate(new PdfDate(signAppearance.getSignDate()));
+            signAppearance.setCryptoDictionary(dic);
+            
+            int contentEstimated = 15000;
+            HashMap exc = new HashMap();
+            exc.put(PdfName.CONTENTS, contentEstimated * 2 + 2);
+            signAppearance.preClose(exc);
+            X509Certificate[] certs = null;
+            if(certificate != null) {
+                certs = new X509Certificate[1];
                 certs[0] = certificate;
+            }
+            CRL[] crls = null;
+            if(crl != null) {
+                crls = new CRL[1];
+                crls[0] = crl;
+            }
+            PdfPKCS7 sgn = new PdfPKCS7(key, certs, crls, AlgorithmsHelper.getHashAlgFromSignAlg(signAlg), cryptographyProvider.getName(), false);
             
-            //Procesar firma
-            MakeSignature.signDetached(
-                signAppearance, 
-                digest, 
-                es, 
-                certs, 
-                null, 
-                null, 
-                null, 
-                0, 
-                CryptoStandard.CMS
-            );
+            InputStream data = signAppearance.getRangeStream();
+            MessageDigest messageDigest = MessageDigest.getInstance(AlgorithmsHelper.getHashAlgFromSignAlg(signAlg));
+            byte buf[] = new byte[8192];
+            int n;
+            while ((n = data.read(buf)) > 0) {
+                messageDigest.update(buf, 0, n);
+            }
+            byte hash[] = messageDigest.digest();
+            
+            Calendar cal = Calendar.getInstance();
+            byte[] OCSPResponse = null;
+            TSAClient TSSClient = null;
+            
+            byte sh[] = sgn.getAuthenticatedAttributeBytes(hash, cal, OCSPResponse);
+            sgn.update(sh, 0, sh.length);
+            
+            byte[] encodedSig = sgn.getEncodedPKCS7(hash, cal, TSSClient, OCSPResponse);
+            if (contentEstimated + 2 < encodedSig.length)
+                throw new PDFOperadorException(I18n.get(I18n.M_ERROR_PDF_SIGN_SPACE));
+            byte[] paddedSig = new byte[contentEstimated];
+            System.arraycopy(encodedSig, 0, paddedSig, 0, encodedSig.length);
+            PdfDictionary dic2 = new PdfDictionary();
+            dic2.put(PdfName.CONTENTS, new PdfString(paddedSig).setHexWriting(true));
+            signAppearance.close(dic2);
             
             //Return
             return signedPDF.toByteArray();
+            
         } catch (ProviderException ex) {
             throw new PDFOperadorException(new AlgorithmsHelperException(AlgorithmsHelperException.ERROR_ALGORITHMS_NOT_SUPPORTED_BY_DEVICE));
             
@@ -396,121 +419,9 @@ public class PDFOperator {
         }
     }
     
-    public static byte[] preProcessPDFSign(
-        PdfReader pdfIn,
-        X509Certificate certificate, 
-        String readPass, 
-        String writePass, 
-        String reason, 
-        String location, 
-        String contact, 
-        Date signDate, 
-        String signAlg, 
-        boolean noModify, 
-        boolean visible, 
-        int page,
-        byte[] imgInBytes, 
-        float imgP1X, 
-        float imgP1Y, 
-        float imgP2X, 
-        float imgP2Y, 
-        int imgRotation,
-        Provider cryptographyProvider
-    ) throws PDFOperadorException {
-        
-        try {
-            AlgorithmsHelper.isSupportedSignAlg(signAlg);
-            
-            ByteArrayOutputStream signedPDF = new ByteArrayOutputStream();
-            PdfStamper pdfStamper = PDFOperator.generateSignStamper(pdfIn, signedPDF);
-            
-            //Crear y configurar apariencia y propiedades de la firma
-            PdfSignatureAppearance signAppearance = PDFOperator.initSignatureAppearance(
-                pdfStamper, 
-                certificate, 
-                readPass, 
-                writePass, 
-                reason, 
-                location, 
-                contact, 
-                signDate, 
-                noModify, 
-                visible, 
-                page, 
-                imgInBytes, 
-                imgP1X, 
-                imgP1Y, 
-                imgP2X, 
-                imgP2Y, 
-                imgRotation
-            );
-            
-            //PreClose de propiedadesFirma
-            PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
-                dic.setReason(signAppearance.getReason());
-                dic.setLocation(signAppearance.getLocation());
-                dic.setContact(signAppearance.getContact());
-                dic.setDate(new PdfDate(signAppearance.getSignDate()));
-            signAppearance.setCryptoDictionary(dic);
-            HashMap<PdfName, Integer> exc = new HashMap<>();
-            exc.put(PdfName.CONTENTS, 8192 * 2 + 2);
-            signAppearance.preClose(exc);
-            
-            //Carcular Hash
-            ExternalDigest externalDigest = new ExternalDigest() {
-                @Override
-                public MessageDigest getMessageDigest(String hashAlgorithm) throws GeneralSecurityException {
-                    return DigestAlgorithms.getMessageDigest(hashAlgorithm, null);
-                }
-            };
-            
-            InputStream data = signAppearance.getRangeStream();
-            byte[] hash = DigestAlgorithms.digest(
-                data, 
-                externalDigest.getMessageDigest(AlgorithmsHelper.getHashAlgFromSignAlg(signAlg))
-            );
-            
-            //Preprocesar Firma
-            X509Certificate[] certs = new X509Certificate[1];
-            certs[0] = certificate;
-            ExternalDigest externalDigestClient = new ExternalDigest() {
-                @Override
-                public MessageDigest getMessageDigest(String hashAlgorithm) throws GeneralSecurityException {
-                    return DigestAlgorithms.getMessageDigest(hashAlgorithm, null);
-                }
-            };
-            PdfPKCS7 pdfPKCS7Signer = new PdfPKCS7(
-                null, 
-                certs, 
-                AlgorithmsHelper.getHashAlgFromSignAlg(signAlg), 
-                null, 
-                externalDigestClient, 
-                false
-            );
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(signDate);
-            byte[] firmaPreproc = 
-                pdfPKCS7Signer.getAuthenticatedAttributeBytes(
-                    hash, 
-                    cal, 
-                    null, 
-                    null, 
-                    CryptoStandard.CMS
-            );
-            
-            //Procedimientos finales
-            pdfStamper.close();
-            signedPDF = null;
-            System.gc();
-            
-            return firmaPreproc;
-            
-        } catch (DocumentException | 
-                 IOException | 
-                 IllegalArgumentException | 
-                 GeneralSecurityException ex) {
-            throw new PDFOperadorException(ex);
-        }
+    public static boolean verifySignPDF(PdfReader pdfIn)  throws PDFOperadorException {
+        //OJO... Implementar
+        return false;
     }
     ////////////////////////////////////////////////////////////////////////////
     

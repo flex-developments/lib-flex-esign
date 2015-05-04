@@ -22,7 +22,6 @@
 
 package flex.eSign.helpers;
 
-import flex.eSign.i18n.I18n;
 import java.security.Provider;
 import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -36,32 +35,22 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class ProviderHelper {
     
-    public static Provider getRegCryptographyProvider(Provider cryptographyProvider) throws NullPointerException {
-        if (cryptographyProvider != null) {
-            if (Security.getProvider(cryptographyProvider.getName()) != null) {
-                Security.removeProvider(cryptographyProvider.getName());
-                Security.addProvider(cryptographyProvider);
-            } else {
-                Security.addProvider(cryptographyProvider);
-            }
-            return cryptographyProvider;
-            
+    /**
+     * Return a registered cryptography provider. If cryptographyProvider is null,
+     * then return BouncyCastle provider by default.
+     * 
+     * @param cryptographyProvider provider to register.
+     * @return 
+     */
+    public static Provider getRegCryptographyProvider(Provider cryptographyProvider) {
+        if(cryptographyProvider == null) return getRegCryptographyProvider(new BouncyCastleProvider());
+        
+        if (Security.getProvider(cryptographyProvider.getName()) != null) {
+            Security.removeProvider(cryptographyProvider.getName());
+            Security.addProvider(cryptographyProvider);
         } else {
-            throw new NullPointerException(I18n.get(I18n.M_ERROR_NULL_PROVIDER));
+            Security.addProvider(cryptographyProvider);
         }
-    }
-    
-    public static Provider getRegBouncyCastleCryptographyProvider() {
-        return getRegCryptographyProvider(new BouncyCastleProvider());
-    }
-    
-    public static Provider getRegCryptographyProviderOrDefault(Provider cryptographyProvider) {
-        try {
-            return getRegCryptographyProvider(cryptographyProvider);
-            
-        } catch (NullPointerException ex) {
-            ex = null;
-            return getRegBouncyCastleCryptographyProvider();
-        }
+        return cryptographyProvider;
     }
 }

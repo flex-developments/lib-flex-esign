@@ -28,7 +28,6 @@ import flex.eSign.operators.signers.PDFOperator;
 import flex.helpers.FileHelper;
 import flex.pkikeys.PKIKeys;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -54,17 +53,18 @@ public class PDFOperatorTest {
         try {
             PKIKeys clientKeys = TestsResources.getKeys(true, false, true);
             
-            String rutaOrigen = TestsResources.resourcesPath + "prueba1.pdf";
-            String rutaDestino = TestsResources.resourcesPath + "prueba2.pdf";
+            String rutaOrigen = TestsResources.resourcesPath + "prueba.pdf";
+            String rutaDestino = TestsResources.resourcesPath + "prueba-Firmado.pdf";
             byte[] imageInByte = FileHelper.getBytes(TestsResources.resourcesPath + "fondo_firma.png");
             PdfReader pdfIn = PDFOperator.getPdfReader(new File(rutaOrigen), null);
-            //Date fechaFirma = new Date();
-            Date fechaFirma = (new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("10-10-2014 00:00:00"));
+            Date fechaFirma = new Date();
+            //Date fechaFirma = (new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("10-10-2014 00:00:00"));
             
             byte[] pdfFirmado = PDFOperator.signLocalPDF(
                 pdfIn, 
                 clientKeys.getPrivateKey(), 
                 clientKeys.getSignCertificate(), 
+                null,
                 null, 
                 null, 
                 "Razon", 
@@ -73,8 +73,8 @@ public class PDFOperatorTest {
                 fechaFirma, 
                 AlgorithmsHelper.SIGN_ALGORITHM_SHA512_RSA, 
                 false, 
-                true, 
-                19, 
+                false, 
+                1, 
                 imageInByte, 
                 200, 
                 200, 

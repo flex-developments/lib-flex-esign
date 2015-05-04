@@ -97,7 +97,7 @@ public class PKCS7SignOperator {
         
         try {
             AlgorithmsHelper.isSupportedSignAlg(signAlg);
-            cryptographyProvider = ProviderHelper.getRegCryptographyProviderOrDefault(cryptographyProvider);
+            cryptographyProvider = ProviderHelper.getRegCryptographyProvider(cryptographyProvider);
             
             CMSProcessableByteArray content = new CMSProcessableByteArray(data); //buffer
             

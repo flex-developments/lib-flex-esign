@@ -70,7 +70,7 @@ public class BasicSignOperator {
         
         try {
             AlgorithmsHelper.isSupportedSignAlg(signAlg);
-            cryptographyProvider = ProviderHelper.getRegCryptographyProviderOrDefault(cryptographyProvider);
+            cryptographyProvider = ProviderHelper.getRegCryptographyProvider(cryptographyProvider);
             
             Signature digitalSign = Signature.getInstance(signAlg);
             digitalSign.initSign(privateKey);
@@ -103,7 +103,7 @@ public class BasicSignOperator {
         
         try {
             AlgorithmsHelper.isSupportedSignAlg(signAlg);
-            ProviderHelper.getRegCryptographyProviderOrDefault(cryptographyProvider);
+            ProviderHelper.getRegCryptographyProvider(cryptographyProvider);
             
             if(isBasicSign(new String(sign))) {
                 sign = decode(new String(sign));

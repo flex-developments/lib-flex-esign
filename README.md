@@ -2,13 +2,12 @@
 Librería que provee operaciones criptográficas para firma electrónica, métodos para validación de certificados y algunos métodos útiles para operaciones sobre objetos específicos.
 
 ## Dependencias
- * itextpdf-v552-nonofficial v010
-   * xmlsec-1.5.2-nonofficial
- * bc-jdk15to17-v150-nonofficial v010
- * lib-flex-pkikeys v010
- * lib-flex-helpers v010
-   * commons-net-3.1
-   * mail
+ * itextpdf-v420-nonofficial v020
+ * bc-jdk15to17-v150-nonofficial v020
+ * lib-flex-pkikeys v020
+ * lib-flex-helpers v020
+   * commons-net-3.3 (http://commons.apache.org/proper/commons-net/download_net.cgi)
+   * javax.mail  (https://java.net/projects/javamail/pages/Home)
 
 ## Copyright (C) 2010 - Ing. Félix D. López M.
  * Ing. Félix D. López M. - flex.developments en gmail
